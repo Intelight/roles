@@ -5,9 +5,10 @@
   "main": "lib/index.js",
   "scripts": {
     "start": "webpack -p --config --progress --watch",
-    "compile": "babel -d lib/ src/",
-    "prepublish": "npm run compile",
-    "test": "mocha --compilers js:babel-core/register \"src/**/*.spec.js\"",
+    "compile": "webpack -p --config --progress",
+    "prepublish": "npm run bundle",
+    "testonly": "mocha --compilers js:babel-core/register \"src/**/*.spec.js\"",
+    "test": "npm run testonly && npm run lint",
     "lint": "eslint src",
     "coverage": "istanbul cover _mocha -- --compilers js:babel-core/register \"src/**/*.spec.js\" -R spec",
     "coveralls": "istanbul cover _mocha --report lcovonly -- --compilers js:babel-core/register \"src/**/*.spec.js\" -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
