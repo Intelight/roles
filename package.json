@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "start": "webpack -p --config --progress --watch",
-    "compile": "webpack -p --config --progress",
+    "bundle": "webpack -p --config --progress",
     "prepublish": "npm run bundle",
     "testonly": "mocha --compilers js:babel-core/register \"src/**/*.spec.js\"",
     "test": "npm run testonly && npm run lint",
