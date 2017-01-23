@@ -63,4 +63,18 @@ export default class {
     const groupId = await this.redis.hget('groups', group);
     return groupId || null;
   }
+  async deleteRole(role, group) {
+    const ids = await this.findRole(role, group);
+    if (ids) {
+      const { roleId, groupId } = ids;
+      const pipeline = this.redis.pipeline();
+      const usersWithRole = await this.redis.smembers(`role:${roleId}:users`);
+      usersWithRole.forEach(userId => pipeline.srem(`user:${userId}:roles`, roleId));
+      pipeline.hdel('roles', role);
+      pipeline.del(`roles:${roleId}:users`);
+      pipeline.hdel('groups', group);
+      pipeline.srem(`group:${groupId}`, roleId);
+      await pipeline.exec();
+    }
+  }
 }

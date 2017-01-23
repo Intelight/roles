@@ -84,4 +84,20 @@ describe('RedisDBDriver', () => {
       expect(res).toEqual(false);
     });
   });
+  describe('deleteRole', () => {
+    const db = init();
+    it('deletes role', async () => {
+      const userId = '123';
+      const role = 'create';
+      const group = 'admin';
+      await db.addUserToRoles(userId, [role], group);
+      const { roleId, groupId } = await db.findRole(role, group);
+      await db.deleteRole(role, group);
+      expect(await db.redis.sismember(`user:${userId}:roles`, roleId));
+      expect(await db.redis.hget('roles', role)).toBeFalsy();
+      expect(await db.redis.get(`roles:${roleId}:users`)).toBeFalsy();
+      expect(await db.redis.hget('groups', group)).toBeFalsy();
+      expect(await db.redis.sismember(`groups:${groupId}`, roleId)).toBeFalsy();
+    });
+  });
 });
