@@ -1,7 +1,7 @@
 {
-  "name": "roles-server",
+  "name": "roles-common",
   "version": "0.0.1",
-  "description": "Roles server side package",
+  "description": "Roles common package",
   "main": "lib/index.js",
   "publishConfig": {
     "access": "public"
@@ -25,7 +25,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/intelight/roles/tree/master/packages/server"
+    "url": "https://github.com/intelight/roles/tree/master/packages/common"
   },
   "keywords": [
     "roles",
@@ -34,8 +34,7 @@
   "author": "Tim Mikeladze",
   "license": "MIT",
   "dependencies": {
-    "lodash": "^4.16.4",
-    "roles-common": "^0.0.1"
+    "lodash": "^4.16.4"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
