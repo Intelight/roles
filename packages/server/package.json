@@ -1,5 +1,5 @@
 {
-  "name": "@roles/server",
+  "name": "roles-server",
   "version": "0.0.1",
   "description": "Roles server side package",
   "main": "lib/index.js",

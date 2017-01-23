@@ -1,5 +1,5 @@
 {
-  "name": "@roles/rest-express",
+  "name": "roles-rest-express",
   "version": "0.0.1",
   "description": "Roles rest express middleware",
   "main": "lib/index.js",

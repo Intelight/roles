@@ -1,5 +1,5 @@
 {
-  "name": "@roles/rest-client",
+  "name": "roles-rest-client",
   "version": "0.0.1",
   "description": "Roles rest client transport",
   "main": "lib/index.js",

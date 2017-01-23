@@ -8,7 +8,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, '/lib'),
     filename: 'index.js',
-    library: '@roles/client',
+    library: 'roles-client',
     libraryTarget: 'umd',
   },
   modulesDirectories: [
