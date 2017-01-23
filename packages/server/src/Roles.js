@@ -50,7 +50,7 @@ const Roles = {
     if (await this.db.roleExists(role, group)) {
       throw new Error('role already exists');
     }
-    const roleId = await this.db.addRole(role);
+    const roleId = await this.db.addRole(role, group);
     return roleId;
   },
   deleteRole(role: string, group: string = DEFAULT_GROUP): Promise<void> {
