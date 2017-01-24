@@ -72,8 +72,19 @@ export default class {
       usersWithRole.forEach(userId => pipeline.srem(`user:${userId}:roles`, roleId));
       pipeline.hdel('roles', role);
       pipeline.del(`roles:${roleId}:users`);
-      pipeline.hdel('groups', group);
       pipeline.srem(`group:${groupId}`, roleId);
+      await pipeline.exec();
+    }
+  }
+  async deleteGroup(group) {
+    const groupId = await this.findGroup(group);
+    if (groupId) {
+      const pipeline = this.redis.pipeline();
+      const rolesInGroup = await this.redis.smembers(`group:${groupId}`);
+      await Promise.all(rolesInGroup.map(async role => await this.deleteRole(role, group)));
+      pipeline.hdel('groups', group);
+      pipeline.del(`group:${groupId}`);
+      pipeline.del(`group:${groupId}:users`);
       await pipeline.exec();
     }
   }
