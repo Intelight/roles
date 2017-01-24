@@ -73,7 +73,8 @@ describe('RedisDBDriver', () => {
     const db = init();
     it('exists', async () => {
       await db.redis.hmset('groups', { admin: '123' });
-      await db.redis.sadd('group:123', 'create');
+      await db.redis.hmset('roles', { create: '456' });
+      await db.redis.sadd('group:123', '456');
       const res = await db.roleExists('create', 'admin');
       expect(res).toEqual(true);
     });
@@ -112,6 +113,23 @@ describe('RedisDBDriver', () => {
       expect(await db.redis.get(`group:${groupId}`)).toBeFalsy();
       expect(await db.redis.get(`group:${groupId}:users`)).toBeFalsy();
       expect(await db.findRole(role, group)).toBeFalsy();
+    });
+  });
+  describe('createRole', () => {
+    const db = init();
+    it('create roles', async () => {
+      const role = 'create';
+      const group = 'admin';
+      const { roleId, groupId } = await db.createRole(role, group);
+      expect(await db.redis.hget('roles', role)).toBeTruthy();
+      expect(await db.redis.hget('groups', group)).toBeTruthy();
+      expect(await db.redis.sismember(`group:${groupId}`, roleId)).toBeTruthy();
+    });
+    it('does not create role if already exists', async () => {
+      const role = 'create';
+      const group = 'admin';
+      await db.createRole(role, group);
+      expect(await db.createRole(role, group)).toBeFalsy();
     });
   });
 });

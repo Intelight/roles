@@ -40,12 +40,8 @@ export default class {
     return null;
   }
   async roleExists(role, group) {
-    const groupId = await this.redis.hget('groups', group);
-    if (groupId) {
-      const exists = await this.redis.sismember(`group:${groupId}`, role);
-      return exists === 1;
-    }
-    return false;
+    const exists = await this.findRole(role, group) !== null;
+    return exists;
   }
   async findRole(role, group) {
     const groupId = await this.redis.hget('groups', group);
