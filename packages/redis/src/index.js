@@ -31,6 +31,7 @@ export default class {
       const pipeline = this.redis.multi();
       pipeline.hmset('roles', { [role]: roleId });
       pipeline.hmset('groups', { [group]: groupId });
+      pipeline.hmset('groups:id:name', { [groupId]: group });
       pipeline.sadd(`group:${groupId}`, roleId);
       await pipeline.exec();
       return {
@@ -82,6 +83,7 @@ export default class {
       const usersWithGroup = await this.redis.smembers(`group:${groupId}:users`);
       usersWithGroup.forEach(userId => pipeline.srem(`user:${userId}:groups`, groupId));
       pipeline.hdel('groups', group);
+      pipeline.hdel('groups:id:name', groupId);
       pipeline.del(`group:${groupId}`);
       pipeline.del(`group:${groupId}:users`);
       await pipeline.exec();
@@ -104,8 +106,16 @@ export default class {
     }
     return false;
   }
-  async getGroupsForUser(userId, group) {
-    // const groupIds = await this.redis.smembers(`group:${groupId}:users`);
+  async getGroupsForUser(userId) {
+    const groupIds = await this.redis.smembers(`user:${userId}:groups`);
+    if (!groupIds || groupIds.length === 0) {
+      return [];
+    }
+    const res = {};
+    await Promise.all(groupIds.map(async (id) => {
+      const name = await this.redis.hget('groups:id:name', id);
+      res[id] = name;
+    }));
+    return res;
   }
-
 }

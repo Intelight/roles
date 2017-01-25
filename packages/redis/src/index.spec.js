@@ -116,6 +116,7 @@ describe('RedisDBDriver', () => {
       expect(await db.redis.get(`group:${groupId}:users`)).toBeFalsy();
       expect(await db.findRole(role, group)).toBeFalsy();
       expect(await db.redis.sismember(`user:${userId}:groups`, groupId)).toBeFalsy();
+      expect(await db.redis.hget('groups:id:name', groupId)).toBeFalsy();
     });
   });
   describe('createRole', () => {
@@ -133,14 +134,6 @@ describe('RedisDBDriver', () => {
       const group = 'admin';
       await db.createRole(role, group);
       expect(await db.createRole(role, group)).toBeFalsy();
-    });
-  });
-  describe('getGroupsForUser', () => {
-    const db = init();
-    it('gets groups for user', async () => {
-      // expect(await db.getAllRoles()).toEqual({
-      //
-      // });
     });
   });
   describe('userIsInGroup', () => {
@@ -172,6 +165,22 @@ describe('RedisDBDriver', () => {
       const role = 'create';
       const group = 'admin';
       expect(await db.userIsInRole(userId, role, group)).toEqual(false);
+    });
+  });
+  describe('getGroupsForUser', () => {
+    const db = init();
+    it('get groups', async () => {
+      const userId = '123';
+      const role = 'create';
+      const adminGroup = 'admin';
+      const userGroup = 'user';
+      await db.addUserToRoles(userId, [role], adminGroup);
+      await db.addUserToRoles(userId, [role], userGroup);
+      const adminGroupId = await db.findGroup(adminGroup);
+      const userGroupId = await db.findGroup(userGroup);
+      const groups = await db.getGroupsForUser(userId);
+      expect(groups[adminGroupId]).toEqual('admin');
+      expect(groups[userGroupId]).toEqual('user');
     });
   });
 });
