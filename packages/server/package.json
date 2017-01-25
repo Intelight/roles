@@ -1,5 +1,5 @@
 {
-  "name": "@roles/server",
+  "name": "roles-server",
   "version": "0.0.1",
   "description": "Roles server side package",
   "main": "lib/index.js",
@@ -34,7 +34,8 @@
   "author": "Tim Mikeladze",
   "license": "MIT",
   "dependencies": {
-    "lodash": "^4.16.4"
+    "lodash": "^4.16.4",
+    "roles-common": "^0.0.1"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",

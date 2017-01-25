@@ -1,7 +1,7 @@
 {
-  "name": "roles-rest-client",
+  "name": "roles-common",
   "version": "0.0.1",
-  "description": "Roles rest client transport",
+  "description": "Roles common package",
   "main": "lib/index.js",
   "publishConfig": {
     "access": "public"
@@ -25,12 +25,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/intelight/roles/tree/master/packages/rest-client"
+    "url": "https://github.com/intelight/roles/tree/master/packages/common"
   },
   "keywords": [
     "roles",
-    "permissions",
-    "rest"
+    "permissions"
   ],
   "author": "Tim Mikeladze",
   "license": "MIT",

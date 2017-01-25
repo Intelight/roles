@@ -1,5 +1,5 @@
 {
-  "name": "@roles/react",
+  "name": "roles-react",
   "version": "0.0.1",
   "description": "Roles React components",
   "main": "lib/index.js",

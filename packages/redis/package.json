@@ -1,7 +1,7 @@
 {
-  "name": "roles-rest-client",
+  "name": "roles-redis",
   "version": "0.0.1",
-  "description": "Roles rest client transport",
+  "description": "Roles redis driver",
   "main": "lib/index.js",
   "publishConfig": {
     "access": "public"
@@ -14,7 +14,7 @@
     "pretest": "npm run lint",
     "test": "npm run testonly",
     "test-ci": "npm lint && npm coverage",
-    "testonly": "jest",
+    "testonly": "jest --forceExit",
     "lint": "eslint src",
     "coverage": "npm run testonly -- --coverage",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
@@ -25,17 +25,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/intelight/roles/tree/master/packages/rest-client"
+    "url": "https://github.com/intelight/roles/tree/master/packages/redis"
   },
   "keywords": [
     "roles",
     "permissions",
-    "rest"
+    "rest",
+    "redis"
   ],
   "author": "Tim Mikeladze",
   "license": "MIT",
   "dependencies": {
-    "lodash": "^4.16.4"
+    "ioredis": "^2.5.0",
+    "lodash": "^4.16.4",
+    "shortid": "^2.2.6"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
