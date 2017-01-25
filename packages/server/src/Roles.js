@@ -103,13 +103,6 @@ const Roles = {
       }
     });
   },
-  async setUserRoles(userId, roles) {
-    const foundUser = await this.userResolver.findUserById(userId);
-    if (foundUser) {
-      return await this.db.setUserRoles(userId);
-    }
-    throw new Error(`userId ${userId} not found`);
-  },
   userIsInRole(userId, role, group = DEFAULT_GROUP) {
     return this.db.userIsInRole(userId, role, group);
   },

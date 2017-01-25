@@ -190,22 +190,51 @@ describe('RedisDBDriver', () => {
     const db = init();
     it('get groups', async () => {
       const userId = '123';
-      const role = 'create';
+      const adminRole = 'create';
       const adminGroup = 'admin';
+      const userRole = 'edit';
       const userGroup = 'user';
-      await db.addUserToRoles(userId, [role], adminGroup);
-      await db.addUserToRoles(userId, [role], userGroup);
-      const adminRoleId = await db.redis.hget('roles', `${adminGroup}:${role}`);
-      const userRoleId = await db.redis.hget('roles', `${userGroup}:${role}`);
+      await db.addUserToRoles(userId, [adminRole], adminGroup);
+      await db.addUserToRoles(userId, [userRole], userGroup);
+      const adminRoleId = await db.redis.hget('roles', `${adminGroup}:${adminRole}`);
+      const adminGroupId = await db.redis.hget('groups', adminGroup);
+      const userRoleId = await db.redis.hget('roles', `${userGroup}:${userRole}`);
+      const userGroupId = await db.redis.hget('groups', userGroup);
       const roles = await db.getRolesForUser(userId);
       expect(roles[adminRoleId]).toEqual({
-        role,
+        role: adminRole,
         group: adminGroup,
+        groupId: adminGroupId,
       });
       expect(roles[userRoleId]).toEqual({
-        role,
+        role: userRole,
         group: userGroup,
+        groupId: userGroupId,
       });
+    });
+  });
+  describe('removeUserFromRoles', () => {
+    const db = init();
+    it('remove user from roles', async () => {
+      const userId = '123';
+      const roles = ['create', 'remove'];
+      const adminGroup = 'admin';
+      await db.addUserToRoles(userId, roles, adminGroup);
+      await db.removeUserFromRoles(userId, roles, adminGroup);
+      const res = await db.getRolesForUser(userId);
+      expect(res.length).toEqual(0);
+    });
+  });
+  describe('removeUserFromGroup', () => {
+    const db = init();
+    it('remove user from group', async () => {
+      const userId = '123';
+      const roles = ['create', 'remove'];
+      const adminGroup = 'admin';
+      await db.addUserToRoles(userId, roles, adminGroup);
+      await db.removeUserFromGroup(userId, adminGroup);
+      const res = await db.getGroupsForUser(userId);
+      expect(res.length).toEqual(0);
     });
   });
 });

@@ -134,8 +134,25 @@ export default class {
       res[id] = {
         role,
         group: groupName,
+        groupId,
       };
     }));
     return res;
+  }
+  async removeUserFromRoles(userId, roles, group) {
+    const roleIds = await Promise.all(
+      roles.map(async role => await this.redis.hget('roles', `${group}:${role}`)),
+    );
+    await this.redis.srem(`user:${userId}:roles`, roleIds);
+  }
+  async removeUserFromGroup(userId, group) {
+    const groupId = await this.redis.hget('groups', group);
+    const roleIds = await this.redis.smembers(`group:${groupId}`);
+    const pipeline = this.redis.multi();
+    roleIds.forEach(roleId => pipeline.srem(`role:${roleId}:users`, userId));
+    pipeline.srem(`user:${userId}:roles`, roleIds);
+    pipeline.srem(`group:${groupId}:users`, userId);
+    pipeline.srem(`user:${userId}:groups`, groupId);
+    await pipeline.exec();
   }
 }
