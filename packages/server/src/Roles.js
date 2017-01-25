@@ -56,8 +56,8 @@ const Roles = {
   deleteGroup(group = DEFAULT_GROUP) {
     return this.db.deleteGroup(group);
   },
-  getAllRoles(): Promise<Object> {
-    return this.db.getAllRoles();
+  getAll() {
+    return this.db.getAll();
   },
   async getGroupsForUser(userId) {
     const foundUser = await this.userResolver.findUserById(userId);

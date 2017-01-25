@@ -27,14 +27,17 @@ export default class {
   async createRole(role, group) {
     if (!await this.roleExists(role, group)) {
       const roleId = shortId.generate();
-      const groupId = shortId.generate();
       const pipeline = this.redis.multi();
       pipeline.hmset('roles', { [`${group}:${role}`]: roleId });
       pipeline.hmset('roles:id:name', { [roleId]: role });
-      pipeline.set(`role:${roleId}`, groupId);
-      pipeline.hmset('groups', { [group]: groupId });
-      pipeline.hmset('groups:id:name', { [groupId]: group });
+      let groupId = await this.findGroup(group);
+      if (!groupId) {
+        groupId = shortId.generate();
+        pipeline.hmset('groups', { [group]: groupId });
+        pipeline.hmset('groups:id:name', { [groupId]: group });
+      }
       pipeline.sadd(`group:${groupId}`, roleId);
+      pipeline.set(`role:${roleId}`, groupId);
       await pipeline.exec();
       return {
         roleId,
@@ -154,5 +157,32 @@ export default class {
     pipeline.srem(`group:${groupId}:users`, userId);
     pipeline.srem(`user:${userId}:groups`, groupId);
     await pipeline.exec();
+  }
+  async getAll() {
+    const groups = await this.redis.hgetall('groups:id:name');
+    let res = {};
+    await Promise.all(Object.keys(groups).map(async (id) => {
+      const roleIds = await this.redis.smembers(`group:${id}`);
+      let roles = {};
+      await Promise.all(roleIds.map(async (roleId) => {
+        const role = await this.redis.hget('roles:id:name', roleId);
+        roles = {
+          [roleId]: {
+            roleId,
+            role,
+          },
+          ...roles,
+        };
+      }));
+      res = {
+        [id]: {
+          groupId: id,
+          group: groups[id],
+          roles,
+        },
+        ...res,
+      };
+    }));
+    return res;
   }
 }

@@ -237,4 +237,37 @@ describe('RedisDBDriver', () => {
       expect(res.length).toEqual(0);
     });
   });
+  describe('getAll', () => {
+    const db = init();
+    it('gets all roles and groups', async () => {
+      const adminCreate = await db.createRole('create', 'admin');
+      const adminDelete = await db.createRole('delete', 'admin');
+      const userEdit = await db.createRole('edit', 'user');
+      const res = await db.getAll();
+      expect(res[userEdit.groupId]).toEqual({
+        groupId: userEdit.groupId,
+        group: 'user',
+        roles: {
+          [userEdit.roleId]: {
+            roleId: userEdit.roleId,
+            role: 'edit',
+          },
+        },
+      });
+      expect(res[adminCreate.groupId]).toEqual({
+        groupId: adminCreate.groupId,
+        group: 'admin',
+        roles: {
+          [adminCreate.roleId]: {
+            roleId: adminCreate.roleId,
+            role: 'create',
+          },
+          [adminDelete.roleId]: {
+            roleId: adminDelete.roleId,
+            role: 'delete',
+          },
+        },
+      });
+    });
+  });
 });
