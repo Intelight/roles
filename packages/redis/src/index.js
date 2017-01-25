@@ -16,8 +16,9 @@ export default class {
       }
     }));
     if (roleIds.length > 0) {
-      const pipeline = this.redis.pipeline();
+      const pipeline = this.redis.multi();
       pipeline.sadd(`user:${userId}:roles`, roleIds);
+      pipeline.sadd(`user:${userId}:groups`, groupId);
       pipeline.sadd(`group:${groupId}:users`, userId);
       roleIds.forEach(roleId => pipeline.sadd(`role:${roleId}:users`, userId));
       await pipeline.exec();
@@ -27,7 +28,7 @@ export default class {
     if (!await this.roleExists(role, group)) {
       const roleId = shortId.generate();
       const groupId = shortId.generate();
-      const pipeline = this.redis.pipeline();
+      const pipeline = this.redis.multi();
       pipeline.hmset('roles', { [role]: roleId });
       pipeline.hmset('groups', { [group]: groupId });
       pipeline.sadd(`group:${groupId}`, roleId);
@@ -63,7 +64,7 @@ export default class {
     const ids = await this.findRole(role, group);
     if (ids) {
       const { roleId, groupId } = ids;
-      const pipeline = this.redis.pipeline();
+      const pipeline = this.redis.multi();
       const usersWithRole = await this.redis.smembers(`role:${roleId}:users`);
       usersWithRole.forEach(userId => pipeline.srem(`user:${userId}:roles`, roleId));
       pipeline.hdel('roles', role);
@@ -75,13 +76,19 @@ export default class {
   async deleteGroup(group) {
     const groupId = await this.findGroup(group);
     if (groupId) {
-      const pipeline = this.redis.pipeline();
+      const pipeline = this.redis.multi();
       const rolesInGroup = await this.redis.smembers(`group:${groupId}`);
       await Promise.all(rolesInGroup.map(async role => await this.deleteRole(role, group)));
+      const usersWithGroup = await this.redis.smembers(`group:${groupId}:users`);
+      usersWithGroup.forEach(userId => pipeline.srem(`user:${userId}:groups`, groupId));
       pipeline.hdel('groups', group);
       pipeline.del(`group:${groupId}`);
       pipeline.del(`group:${groupId}:users`);
       await pipeline.exec();
     }
   }
+  async getGroupsForUser(userId) {
+    // const groupIds = await this.redis.smembers(`group:${groupId}:users`);
+  }
+
 }

@@ -38,6 +38,8 @@ describe('RedisDBDriver', () => {
       const usersRoles = await db.redis.smembers(`user:${userId}:roles`);
       expect(usersRoles.includes(createRoleId)).toEqual(true);
       expect(usersRoles.includes(removeRoleId)).toEqual(true);
+      const usersGroups = await db.redis.smembers(`user:${userId}:groups`);
+      expect(usersGroups.includes(groupId)).toEqual(true);
       const createRoleUsers = await db.redis.smembers(`role:${createRoleId}:users`);
       expect(createRoleUsers.includes(userId)).toEqual(true);
       const removeRoleUsers = await db.redis.smembers(`role:${removeRoleId}:users`);
@@ -113,6 +115,7 @@ describe('RedisDBDriver', () => {
       expect(await db.redis.get(`group:${groupId}`)).toBeFalsy();
       expect(await db.redis.get(`group:${groupId}:users`)).toBeFalsy();
       expect(await db.findRole(role, group)).toBeFalsy();
+      expect(await db.redis.sismember(`user:${userId}:groups`, groupId)).toBeFalsy();
     });
   });
   describe('createRole', () => {
@@ -130,6 +133,14 @@ describe('RedisDBDriver', () => {
       const group = 'admin';
       await db.createRole(role, group);
       expect(await db.createRole(role, group)).toBeFalsy();
+    });
+  });
+  describe('getGroupsForUser', () => {
+    const db = init();
+    it('gets groups for user', async () => {
+      // expect(await db.getAllRoles()).toEqual({
+      //
+      // });
     });
   });
 });

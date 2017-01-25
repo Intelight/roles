@@ -41,6 +41,9 @@ const Roles = {
     if (isEmpty(role)) {
       throw new Error('role is required');
     }
+    if (isEmpty(group)) {
+      throw new Error('group is required');
+    }
     if (await this.db.roleExists(role, group)) {
       throw new Error('role already exists');
     }
