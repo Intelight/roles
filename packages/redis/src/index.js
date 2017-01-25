@@ -29,7 +29,9 @@ export default class {
       const roleId = shortId.generate();
       const groupId = shortId.generate();
       const pipeline = this.redis.multi();
-      pipeline.hmset('roles', { [role]: roleId });
+      pipeline.hmset('roles', { [`${group}:${role}`]: roleId });
+      pipeline.hmset('roles:id:name', { [roleId]: role });
+      pipeline.set(`role:${roleId}`, groupId);
       pipeline.hmset('groups', { [group]: groupId });
       pipeline.hmset('groups:id:name', { [groupId]: group });
       pipeline.sadd(`group:${groupId}`, roleId);
@@ -47,7 +49,7 @@ export default class {
   }
   async findRole(role, group) {
     const groupId = await this.redis.hget('groups', group);
-    const roleId = await this.redis.hget('roles', role);
+    const roleId = await this.redis.hget('roles', `${group}:${role}`);
     const exists = await this.redis.sismember(`group:${groupId}`, roleId) === 1;
     if (exists) {
       return {
@@ -68,7 +70,8 @@ export default class {
       const pipeline = this.redis.multi();
       const usersWithRole = await this.redis.smembers(`role:${roleId}:users`);
       usersWithRole.forEach(userId => pipeline.srem(`user:${userId}:roles`, roleId));
-      pipeline.hdel('roles', role);
+      pipeline.hdel('roles', `${role}:${group}`);
+      pipeline.del(`role:${roleId}`);
       pipeline.del(`roles:${roleId}:users`);
       pipeline.srem(`group:${groupId}`, roleId);
       await pipeline.exec();
@@ -115,6 +118,23 @@ export default class {
     await Promise.all(groupIds.map(async (id) => {
       const name = await this.redis.hget('groups:id:name', id);
       res[id] = name;
+    }));
+    return res;
+  }
+  async getRolesForUser(userId) {
+    const roleIds = await this.redis.smembers(`user:${userId}:roles`);
+    if (!roleIds || roleIds.length === 0) {
+      return [];
+    }
+    const res = {};
+    await Promise.all(roleIds.map(async (id) => {
+      const role = await this.redis.hget('roles:id:name', id);
+      const groupId = await this.redis.get(`role:${id}`);
+      const groupName = await this.redis.hget('groups:id:name', groupId);
+      res[id] = {
+        role,
+        group: groupName,
+      };
     }));
     return res;
   }
