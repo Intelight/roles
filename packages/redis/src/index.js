@@ -87,7 +87,24 @@ export default class {
       await pipeline.exec();
     }
   }
-  async getGroupsForUser(userId) {
+  async userIsInRole(userId, role, group) {
+    const res = await this.findRole(role, group);
+    if (res) {
+      const { roleId } = res;
+      const exists = await this.redis.sismember(`user:${userId}:roles`, roleId) === 1;
+      return exists;
+    }
+    return false;
+  }
+  async userIsInGroup(userId, group) {
+    const groupId = await this.findGroup(group);
+    if (groupId) {
+      const exists = await this.redis.sismember(`user:${userId}:groups`, groupId) === 1;
+      return exists;
+    }
+    return false;
+  }
+  async getGroupsForUser(userId, group) {
     // const groupIds = await this.redis.smembers(`group:${groupId}:users`);
   }
 

@@ -143,4 +143,35 @@ describe('RedisDBDriver', () => {
       // });
     });
   });
+  describe('userIsInGroup', () => {
+    const db = init();
+    it('in group', async () => {
+      const userId = '123';
+      const role = 'create';
+      const group = 'admin';
+      await db.addUserToRoles(userId, [role], group);
+      expect(await db.userIsInGroup(userId, group)).toEqual(true);
+    });
+    it('not in group', async () => {
+      const userId = '123';
+      const group = 'admin';
+      expect(await db.userIsInGroup(userId, group)).toEqual(false);
+    });
+  });
+  describe('userIsInRole', () => {
+    const db = init();
+    it('in role', async () => {
+      const userId = '123';
+      const role = 'create';
+      const group = 'admin';
+      await db.addUserToRoles(userId, [role], group);
+      expect(await db.userIsInRole(userId, role, group)).toEqual(true);
+    });
+    it('not in role', async () => {
+      const userId = '123';
+      const role = 'create';
+      const group = 'admin';
+      expect(await db.userIsInRole(userId, role, group)).toEqual(false);
+    });
+  });
 });

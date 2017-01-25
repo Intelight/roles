@@ -113,8 +113,8 @@ const Roles = {
   userIsInRole(userId, role, group = DEFAULT_GROUP) {
     return this.db.userIsInRole(userId, role, group);
   },
-  userIsInGroup(userId) {
-    return this.db.userIsInGroup(userId);
+  userIsInGroup(userId, group = DEFAULT_GROUP) {
+    return this.db.userIsInGroup(userId, group);
   },
 };
 
