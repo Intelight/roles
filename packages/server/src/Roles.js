@@ -47,8 +47,7 @@ const Roles = {
     if (await this.db.roleExists(role, group)) {
       throw new Error('role already exists');
     }
-    const roleId = await this.db.addRole(role, group);
-    return roleId;
+    return this.db.createRole(role, group);
   },
   deleteRole(role, group = DEFAULT_GROUP) {
     return this.db.deleteRole(role, group);
@@ -79,7 +78,7 @@ const Roles = {
   getUsersInGroup(group = DEFAULT_GROUP) {
     return this.db.getUsersInGroup(group);
   },
-  removeUserFromRoles(userId, roles, group = DEFAULT_GROUP) {
+  async removeUserFromRoles(userId, roles, group = DEFAULT_GROUP) {
     if (isEmpty(userId)) {
       throw new Error('userId is required');
     }
@@ -94,14 +93,14 @@ const Roles = {
     // eslint-disable-next-line no-param-reassign
     roles = Array.isArray(roles) ? roles : [roles];
 
-    userId.forEach(async (id: string) => {
+    await Promise.all(userId.map(async (id: string) => {
       const foundUser = await this.userResolver.findUserById(id);
       if (foundUser) {
         await this.db.removeUserFromRoles(id, roles, group);
       } else {
         throw new Error(`userId ${id} not found`);
       }
-    });
+    }));
   },
   async removeUserFromGroup(userId, group = DEFAULT_GROUP) {
     if (isEmpty(userId)) {
@@ -113,14 +112,14 @@ const Roles = {
     // eslint-disable-next-line no-param-reassign
     userId = Array.isArray(userId) ? userId : [userId];
 
-    userId.forEach(async (id: string) => {
+    await Promise.all(userId.map(async (id: string) => {
       const foundUser = await this.userResolver.findUserById(id);
       if (foundUser) {
         await this.db.removeUserFromGroup(id, group);
       } else {
         throw new Error(`userId ${id} not found`);
       }
-    });
+    }));
   },
   userIsInRole(userId, role, group = DEFAULT_GROUP) {
     return this.db.userIsInRole(userId, role, group);
