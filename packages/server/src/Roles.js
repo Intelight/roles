@@ -2,8 +2,13 @@ import { isEmpty } from 'lodash';
 
 export const DEFAULT_GROUP = 'DEFAULT_GROUP';
 
+const defaultOptions = {
+  path: '/roles',
+};
+
 const Roles = {
-  init(db, userResolver) {
+  init(options = {}, db, userResolver) {
+    this.options = { ...defaultOptions, ...options };
     if (!db) {
       throw new Error('A database driver is required');
     }
@@ -126,6 +131,12 @@ const Roles = {
   },
   userIsInGroup(userId, group = DEFAULT_GROUP) {
     return this.db.userIsInGroup(userId, group);
+  },
+  findById(roleId) {
+    if (isEmpty(roleId)) {
+      throw new Error('roleId is required');
+    }
+    return this.db.findById(roleId);
   },
 };
 
