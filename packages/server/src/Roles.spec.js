@@ -5,7 +5,7 @@ describe('init', () => {
     expect(() => Roles.init()).toThrowError('A database driver is required');
   });
   it('throws error if user resolver not provided', () => {
-    expect(() => Roles.init({})).toThrowError('A user resolver is required');
+    expect(() => Roles.init({}, {})).toThrowError('A user resolver is required');
   });
 });
 
@@ -36,7 +36,7 @@ describe('addUserToRoles', () => {
   });
   it('throw error if user id is not found', async () => {
     const findUserById = jest.fn(() => false);
-    Roles.init({}, {
+    Roles.init({}, {}, {
       findUserById,
     });
     try {
@@ -49,7 +49,7 @@ describe('addUserToRoles', () => {
   it('calls db.addUserToRoles', async () => {
     const findUserById = jest.fn(() => Promise.resolve({}));
     const addUserToRoles = jest.fn();
-    Roles.init({
+    Roles.init({}, {
       addUserToRoles,
     }, {
       findUserById,
@@ -77,7 +77,7 @@ describe('createRole', () => {
     }
   });
   it('throw error if role already exists', async () => {
-    Roles.init({
+    Roles.init({}, {
       roleExists: () => Promise.resolve(true),
     }, {});
     try {
@@ -92,7 +92,7 @@ describe('createRole', () => {
       roleId: 'roleId',
       groupId: 'groupId',
     }));
-    Roles.init({
+    Roles.init({}, {
       roleExists: () => Promise.resolve(false),
       createRole,
     }, {});
@@ -109,7 +109,7 @@ describe('createRole', () => {
 describe('deleteRole', () => {
   it('calls db.deleteRole', () => {
     const deleteRole = jest.fn();
-    Roles.init({
+    Roles.init({}, {
       deleteRole,
     }, {});
     Roles.deleteRole('role', 'group');
@@ -122,7 +122,7 @@ describe('deleteRole', () => {
 describe('deleteGroup', () => {
   it('calls db.deleteGroup', () => {
     const deleteGroup = jest.fn();
-    Roles.init({
+    Roles.init({}, {
       deleteGroup,
     }, {});
     Roles.deleteGroup('group');
@@ -134,7 +134,7 @@ describe('deleteGroup', () => {
 describe('getAll', () => {
   it('calls db.getAll', async () => {
     const getAll = jest.fn();
-    Roles.init({
+    Roles.init({}, {
       getAll,
     }, {});
     await Roles.getAll();
@@ -144,7 +144,7 @@ describe('getAll', () => {
 
 describe('getGroupsForUser', () => {
   it('throws error if user not found', async () => {
-    Roles.init({
+    Roles.init({}, {
 
     }, {
       findUserById: () => Promise.resolve(false),
@@ -157,7 +157,7 @@ describe('getGroupsForUser', () => {
     }
   });
   it('calls db.getGroupsForUser', async () => {
-    Roles.init({
+    Roles.init({}, {
       getGroupsForUser: () => Promise.resolve(['group']),
     }, {
       findUserById: () => Promise.resolve(true),
@@ -169,7 +169,7 @@ describe('getGroupsForUser', () => {
 
 describe('getGroupsForUser', () => {
   it('throws error if user not found', async () => {
-    Roles.init({
+    Roles.init({}, {
 
     }, {
       findUserById: () => Promise.resolve(false),
@@ -182,7 +182,7 @@ describe('getGroupsForUser', () => {
     }
   });
   it('calls db.getRolesForUser', async () => {
-    Roles.init({
+    Roles.init({}, {
       getRolesForUser: () => Promise.resolve(['role']),
     }, {
       findUserById: () => Promise.resolve(true),
@@ -195,7 +195,7 @@ describe('getGroupsForUser', () => {
 describe('getUsersInRole', () => {
   it('calls db.getUsersInRole', async () => {
     const getUsersInRole = jest.fn(() => Promise.resolve(['user']));
-    Roles.init({
+    Roles.init({}, {
       getUsersInRole,
     }, {});
     const res = await Roles.getUsersInRole('role');
@@ -207,7 +207,7 @@ describe('getUsersInRole', () => {
 describe('getUsersInGroup', () => {
   it('calls db.getUsersInGroup', async () => {
     const getUsersInGroup = jest.fn(() => Promise.resolve(['user']));
-    Roles.init({
+    Roles.init({}, {
       getUsersInGroup,
     }, {});
     const res = await Roles.getUsersInGroup('group');
@@ -243,7 +243,7 @@ describe('removeUserFromRoles', () => {
   });
   it('throw error if user id is not found', async () => {
     const findUserById = jest.fn(() => false);
-    Roles.init({}, {
+    Roles.init({}, {}, {
       findUserById,
     });
     try {
@@ -256,7 +256,7 @@ describe('removeUserFromRoles', () => {
   it('calls db.removeUserFromRoles', async () => {
     const findUserById = jest.fn(() => Promise.resolve({}));
     const removeUserFromRoles = jest.fn();
-    Roles.init({
+    Roles.init({}, {
       removeUserFromRoles,
     }, {
       findUserById,
@@ -285,7 +285,7 @@ describe('removeUserFromGroup', () => {
   });
   it('throw error if user id is not found', async () => {
     const findUserById = jest.fn(() => false);
-    Roles.init({}, {
+    Roles.init({}, {}, {
       findUserById,
     });
     try {
@@ -298,7 +298,7 @@ describe('removeUserFromGroup', () => {
   it('calls db.removeUserFromGroup', async () => {
     const findUserById = jest.fn(() => Promise.resolve({}));
     const removeUserFromGroup = jest.fn();
-    Roles.init({
+    Roles.init({}, {
       removeUserFromGroup,
     }, {
       findUserById,
@@ -311,7 +311,7 @@ describe('removeUserFromGroup', () => {
 describe('userIsInRole', () => {
   it('calls db.userIsInRole', async () => {
     const userIsInRole = jest.fn(() => Promise.resolve(true));
-    Roles.init({
+    Roles.init({}, {
       userIsInRole,
     }, {});
     const res = await Roles.userIsInRole('123', 'create', 'admin');
@@ -323,11 +323,30 @@ describe('userIsInRole', () => {
 describe('userIsInGroup', () => {
   it('calls db.userIsInGroup', async () => {
     const userIsInGroup = jest.fn(() => Promise.resolve(true));
-    Roles.init({
+    Roles.init({}, {
       userIsInGroup,
     }, {});
     const res = await Roles.userIsInGroup('123', 'admin');
     expect(res).toEqual(true);
     expect(userIsInGroup.mock.calls.length).toEqual(1);
+  });
+});
+describe('findById', () => {
+  it('calls db.findById', async () => {
+    const findById = jest.fn(() => Promise.resolve(true));
+    Roles.init({}, {
+      findById,
+    }, {});
+    const res = await Roles.findById('123');
+    expect(res).toEqual(true);
+    expect(findById.mock.calls.length).toEqual(1);
+  });
+  it('throws error if no role id provided', async () => {
+    try {
+      await Roles.findById();
+      throw Error();
+    } catch (err) {
+      expect(err).toEqual(new Error('roleId is required'));
+    }
   });
 });
