@@ -21,7 +21,7 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "testRegex": "(/.*.(test|spec)).(js|jsx)$"
+    "testRegex": "(src/.*.(test|spec)).(js|jsx)$"
   },
   "repository": {
     "type": "git",
