@@ -117,9 +117,9 @@ await Roles.removeUserFromRoles(userId, ['create', 'read', 'update'], 'admin')
 await Roles.userIsInRole('delete', 'admin') // Returns true
 await Roles.userIsInGroup(userId, 'admin') // Returns true
 
+// Remove the user from group and all the roles in that group
 await Roles.removeUserFromGroup(userId, 'admin')
 
-// Remove the user from group and all the roles in that group
 await Roles.userIsInGroup(userId, 'admin') // Returns false
 
 ```
