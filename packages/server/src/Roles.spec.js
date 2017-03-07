@@ -331,6 +331,43 @@ describe('userIsInGroup', () => {
     expect(userIsInGroup.mock.calls.length).toEqual(1);
   });
 });
+
+describe('userIsSuperUser', () => {
+  it('calls db.userIsSuperUser', async () => {
+    const userIsSuperUser = jest.fn(() => Promise.resolve(true));
+    Roles.init({}, {
+      userIsSuperUser,
+    }, {});
+    const res = await Roles.userIsSuperUser('123');
+    expect(res).toEqual(true);
+    expect(userIsSuperUser.mock.calls.length).toEqual(1);
+  });
+});
+
+describe('addSuperUser', () => {
+  it('calls db.addSuperUser', async () => {
+    const addSuperUser = jest.fn(() => Promise.resolve(true));
+    Roles.init({}, {
+      addSuperUser,
+    }, {});
+    const res = await Roles.addSuperUser('123');
+    expect(res).toEqual(true);
+    expect(addSuperUser.mock.calls.length).toEqual(1);
+  });
+});
+
+describe('removeSuperUser', () => {
+  it('calls db.removeSuperUser', async () => {
+    const removeSuperUser = jest.fn(() => Promise.resolve(true));
+    Roles.init({}, {
+      removeSuperUser,
+    }, {});
+    const res = await Roles.removeSuperUser('123');
+    expect(res).toEqual(true);
+    expect(removeSuperUser.mock.calls.length).toEqual(1);
+  });
+});
+
 describe('findById', () => {
   it('calls db.findById', async () => {
     const findById = jest.fn(() => Promise.resolve(true));
