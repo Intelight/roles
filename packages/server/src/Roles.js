@@ -132,6 +132,15 @@ const Roles = {
   userIsInGroup(userId, group = DEFAULT_GROUP) {
     return this.db.userIsInGroup(userId, group);
   },
+  userIsSuperUser(userId) {
+    return this.db.userIsSuperUser(userId);
+  },
+  addSuperUser(userId) {
+    return this.db.addSuperUser(userId);
+  },
+  removeSuperUser(userId) {
+    return this.db.removeSuperUser(userId);
+  },
   findById(roleId) {
     if (isEmpty(roleId)) {
       throw new Error('roleId is required');
